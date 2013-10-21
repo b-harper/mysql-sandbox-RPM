@@ -1,22 +1,14 @@
-%if 0%{?fedora} <= 14
-%define pvendorlib %{perl_privlib}
-%endif
-%if 0%{?fedora} >= 15
 %define pvendorlib %{perl_vendorlib}
-%endif
-%if 0%{?rhel} >= 5
-%define pvendorlib %{perl_vendorlib}
-%endif
 
 Name: mysql-sandbox
-Version: 3.0.17
-Release: 4%{?dist}
+Version: 3.0.42
+Release: 1%{?dist}
 License: GPLv2
 Group: Development/Libraries
-Summary: Quick painless install of side by side MySQL server in isolation 
-URL: https://launchpad.net/mysql-sandbox 
+Summary: Quick painless install of side by side MySQL server in isolation
+URL: https://launchpad.net/mysql-sandbox
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
-Source0: http://launchpad.net/mysql-sandbox/mysql-sandbox-3/mysql-sandbox-3/+download/MySQL-Sandbox-%{version}.tar.gz 
+Source0: http://launchpad.net/mysql-sandbox/mysql-sandbox-3/mysql-sandbox-3/+download/MySQL-Sandbox-%{version}.tar.gz
 BuildArch: noarch
 
 Patch0: MySQL-Sandbox-3.0.17_perl_mysql_required.patch
@@ -26,8 +18,8 @@ Requires: perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 BuildRequires:  perl(ExtUtils::MakeMaker), perl(Test::More)
 
 %description
-Quick painless install of side by side MySQL server in isolation. 
-MySQL Sandbox is a tool for installing one or more MySQL servers 
+Quick painless install of side by side MySQL server in isolation.
+MySQL Sandbox is a tool for installing one or more MySQL servers
 in isolation, without affecting other servers.
 
 %prep
@@ -39,49 +31,52 @@ in isolation, without affecting other servers.
 # avoid CPAN entirely
 # http://fedoraproject.org/wiki/Packaging/Perl#Useful_tips
 PERL5_CPANPLUS_IS_RUNNING=1 %{__perl} Makefile.PL INSTALLDIRS=vendor
-%{__make} %{?_smp_mflags}
+make %{?_smp_mflags}
 
 %check
-%{__make} test
+make test
 
 %install
 rm -rf %{buildroot}
-%{__make} install PERL_INSTALL_ROOT=%{buildroot}
+make install PERL_INSTALL_ROOT=%{buildroot}
+#This directory only contains an unneeded .packlist file
+rm -rf %{buildroot}%{perl_vendorarch}/auto/MySQL/Sandbox
 
-# To avoid conflict with lrzsz's sb binary
-# https://answers.launchpad.net/mysql-sandbox/+question/151299
-%{__mv} %{buildroot}%{_bindir}/sb %{buildroot}%{_bindir}/mysql-sandbox
+chmod 0755 %{buildroot}%{_bindir}/*
+chmod 0644 %{buildroot}%{pvendorlib}/MySQL/Sandbox/*
+chmod 0644 %{buildroot}%{pvendorlib}/MySQL/Sandbox.pm
 
 %clean
 rm -rf %{buildroot}
 
 %files
-%defattr(644, root, root)
-%attr(755, root, root) %{_bindir}/low_level_make_sandbox
-%attr(755, root, root) %{_bindir}/make_multiple_custom_sandbox
-%attr(755, root, root) %{_bindir}/make_multiple_sandbox
-%attr(755, root, root) %{_bindir}/make_replication_sandbox
-%attr(755, root, root) %{_bindir}/make_sandbox
-%attr(755, root, root) %{_bindir}/make_sandbox_from_installed
-%attr(755, root, root) %{_bindir}/make_sandbox_from_source
-%attr(755, root, root) %{_bindir}/msandbox
-%attr(755, root, root) %{_bindir}/mysql-sandbox
-%attr(755, root, root) %{_bindir}/sbtool
-%attr(755, root, root) %{_bindir}/test_sandbox
+%{_bindir}/low_level_make_sandbox
+%{_bindir}/make_multiple_custom_sandbox
+%{_bindir}/make_multiple_sandbox
+%{_bindir}/make_replication_sandbox
+%{_bindir}/make_sandbox
+%{_bindir}/make_sandbox_from_installed
+%{_bindir}/make_sandbox_from_source
+%{_bindir}/msandbox
+%{_bindir}/msb
+%{_bindir}/deploy_to_remote_sandboxes.sh
+%{_bindir}/sbtool
+%{_bindir}/test_sandbox
 
-%attr(644, root, root) %{pvendorlib}/MySQL/Sandbox/Recipes.pm
-%attr(644, root, root) %{pvendorlib}/MySQL/Sandbox/Scripts.pm
-%attr(644, root, root) %{pvendorlib}/MySQL/Sandbox.pm
-
-
-# http://fedoraproject.org/wiki/Packaging/Perl#Directory_Ownership
-%exclude %{perl_vendorarch}/auto/
+%{pvendorlib}/MySQL/Sandbox/Recipes.pm
+%{pvendorlib}/MySQL/Sandbox/Scripts.pm
+%{pvendorlib}/MySQL/Sandbox.pm
 
 %{_mandir}/man3/MySQL::Sandbox.3pm.gz
 %{_mandir}/man3/MySQL::Sandbox::Recipes.3pm.gz
 %{_mandir}/man3/MySQL::Sandbox::Scripts.3pm.gz
 
 %changelog
+* Mon Oct 21 2013 Ben Harper <ben.harper@rackspace.com> - 3.0.42-1
+- updated to lastest version
+- binary name changed upstream, no need to rename
+- updated patch0
+
 * Mon May 16 2011 Jeffrey Ness <jeffrey.ness@rackspace.com> - 3.0.17-4
 - To avoid conflict with lrzsz's binary we renamed sb to mysql-sandbox
   https://answers.launchpad.net/mysql-sandbox/+question/151299

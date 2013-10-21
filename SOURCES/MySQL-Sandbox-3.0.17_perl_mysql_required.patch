@@ -1,6 +1,6 @@
---- MySQL-Sandbox-3.0.17/lib/MySQL/Sandbox/Scripts.pm.orig	2011-03-15 14:07:37.000000000 -0500
-+++ MySQL-Sandbox-3.0.17/lib/MySQL/Sandbox/Scripts.pm	2011-03-15 14:07:50.000000000 -0500
-@@ -1157,7 +1157,7 @@
+--- MySQL-Sandbox-3.0.42/lib/MySQL/Sandbox/Scripts.pm.orig	2013-09-30 03:59:30.000000000 -0500
++++ MySQL-Sandbox-3.0.42/lib/MySQL/Sandbox/Scripts.pm	2013-10-21 09:28:31.506402691 -0500
+@@ -1359,7 +1359,7 @@
  
      'grants.mysql'  => <<'GRANTS_MYSQL',
  
